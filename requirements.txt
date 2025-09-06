@@ -1,1 +1,6 @@
-Initial commit message, for project setup
+numpy
+pandas
+matplotlib
+seaborn
+jupyter
+ipykernel
