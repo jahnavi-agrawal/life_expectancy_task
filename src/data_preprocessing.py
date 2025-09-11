@@ -5,18 +5,17 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # finds my raw data 
 data_path = os.path.join(BASE_DIR, "data", "train_data.csv")
 
+def load_data(path):
+    return pd.read_csv(path)
 
-def load_data(data_path):
-    df = pd.read_csv(data_path)
-    return df
-
-def preprocess_data(data_path, target_col="Life_expectancy", save_csv=True):
-    df = load_data(data_path)
-    print(f"Loaded dataset from {data_path}")
+def preprocess_data(path, target_col="life_expectancy", save_csv=True):
+    df = load_data(path)
+    print(f"Loaded dataset from {path}")
 
     # Clean column names
     df.columns = (
         df.columns.str.strip()
+        .str.lower()
         .str.replace(" ", "_")
         .str.replace("-", "_")
         .str.replace("/", "_")
@@ -24,15 +23,11 @@ def preprocess_data(data_path, target_col="Life_expectancy", save_csv=True):
         .str.replace(")", "")
     )
 
-    if "Country" in df.columns:
-        df = df.drop(columns=["Country"])
-
     df = df.drop_duplicates()
+    df = df.drop(columns=["year", "country"])
+    df["status"] = df["status"].map({"Developing": 0.0, "Developed": 1.0})
 
-    # Encode 
-    if "Status" in df.columns:
-        df["Status"] = df["Status"].map({"Developing": 0, "Developed": 1})
-
+    # Fill missing values
     for col in df.columns:
         if df[col].dtype == "object":
             df[col] = df[col].fillna(df[col].mode()[0])
@@ -44,32 +39,26 @@ def preprocess_data(data_path, target_col="Life_expectancy", save_csv=True):
         df[col] = df[col].astype("category").cat.codes
 
     # Standardize
-    numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
-    for col in [target_col, "Year"]:
-        if col in numeric_cols:
-            numeric_cols.remove(col)
+    numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+
+    if target_col in numeric_cols:
+        numeric_cols.remove(target_col)
+
     df[numeric_cols] = (df[numeric_cols] - df[numeric_cols].mean()) / df[numeric_cols].std()
 
-    # Separate features and target
-    X = df.drop(columns=[target_col, "Year"], errors="ignore").values.astype(float)
+    # Prepare features and labels
+    X = df.drop(columns=[target_col]).values.astype(float)
     y = df[target_col].values.astype(float)
 
     # Train-test split
     np.random.seed(42)
-    indices = np.arange(len(X))
-    np.random.shuffle(indices)
-
+    idx = np.arange(len(X))
+    np.random.shuffle(idx)
     split = int(0.8 * len(X))
-    train_i, test_i = indices[:split], indices[split:]
-
-    X_train, X_test = X[train_i], X[test_i]
-    y_train, y_test = y[train_i], y[test_i]
+    X_train, X_test = X[idx[:split]], X[idx[split:]]
+    y_train, y_test = y[idx[:split]], y[idx[split:]]
 
     print(f"Shapes: X_train {X_train.shape}, X_test {X_test.shape}")
-
-    if save_csv:
-        df.to_csv(data_path, index=False)
-        print(f"Stored preprocessed data in: {data_path}")
 
     return X_train, X_test, y_train, y_test
 
