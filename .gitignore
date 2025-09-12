@@ -1,12 +1,9 @@
-# Virtual environment
 .venv/
 
-# Data files
 data/
 *.csv
 
-# Ignore Jupyter checkpoints
+__pycache__/
+
 .ipynb_checkpoints/
 
-# Models 
-#*.pkl
