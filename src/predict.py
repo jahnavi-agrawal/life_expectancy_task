@@ -37,7 +37,7 @@ def main(args):
         f.write("Regression Metrics:\n")
         f.write(f"Mean Squared Error (MSE): {mse:.2f}\n")
         f.write(f"Root Mean Squared Error (RMSE): {rmse:.2f}\n")
-        f.write(f"R-squared (R²) Score: {r2:.2f}\n")
+        f.write(f"R-squared (R^2) Score: {r2:.2f}\n")
 
     print(f"Predictions in {predictions_output_path}")
     print(f"Metrics in {metrics_output_path}")
