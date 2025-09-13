@@ -49,9 +49,21 @@ def preprocess_data(path, target_col="life_expectancy", save_csv=True):
     # Prepare features and labels
     X = df.drop(columns=[target_col]).values.astype(float)
     y = df[target_col].values.astype(float)
-    print(f"Shapes: X_train {X.shape}, y_train {y.shape}")
+    
+    # Train/Test Split 
+    np.random.seed(42)
+    indices = np.arange(len(X))
+    np.random.shuffle(indices)
 
-    return X, y 
+    split = int((1 - 0.2) * len(X))
+    train_idx, test_idx = indices[:split], indices[split:]
+
+    X_train, X_test = X[train_idx], X[test_idx]
+    y_train, y_test = y[train_idx], y[test_idx]
+
+    print(f"Shapes -> X_train {X_train.shape}, y_train {y_train.shape}, X_test {X_test.shape}, y_test {y_test.shape}")
+    return X_train, X_test, y_train, y_test
+
 
 if __name__ == "__main__":
     preprocess_data(data_path)

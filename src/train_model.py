@@ -62,8 +62,8 @@ if __name__ == "__main__":
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     DATA_PATH = os.path.join(BASE_DIR, "data", "train_data.csv")
 
-    X_train, y_train = preprocess_data(DATA_PATH)
-
+    X_train, X_test, y_train, y_test = preprocess_data(DATA_PATH)
+    
     MODELS_DIR = os.path.join(BASE_DIR, "models")
     os.makedirs(MODELS_DIR, exist_ok=True)
 
