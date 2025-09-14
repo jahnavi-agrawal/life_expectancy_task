@@ -62,34 +62,33 @@ if __name__ == "__main__":
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     DATA_PATH = os.path.join(BASE_DIR, "data", "train_data.csv")
 
-    X_train, X_test, y_train, y_test = preprocess_data(DATA_PATH)
+    X, y = preprocess_data(DATA_PATH)
     
     MODELS_DIR = os.path.join(BASE_DIR, "models")
     os.makedirs(MODELS_DIR, exist_ok=True)
 
-    theta_lin = linear_regression(X_train, y_train)
+    theta_lin = linear_regression(X, y)
     with open(os.path.join(MODELS_DIR, "regression_model1.pkl"), "wb") as f:
         pickle.dump(theta_lin, f)
 
-    X_poly = polynomial_features(X_train, degree=2)
-    theta_poly = linear_regression(X_poly, y_train)
+    X_poly = polynomial_features(X, degree=2)
+    theta_poly = linear_regression(X_poly, y)
     with open(os.path.join(MODELS_DIR, "regression_model2.pkl"), "wb") as f:
         pickle.dump((theta_poly, 2), f)
 
-    theta_ridge = ridge_regression(X_train, y_train, lam=10)
+    theta_ridge = ridge_regression(X, y, lam=10)
     with open(os.path.join(MODELS_DIR, "regression_model3.pkl"), "wb") as f:
         pickle.dump(theta_ridge, f)
 
-    theta_lasso = lasso_regression(X_train, y_train, lam=0.1)
+    theta_lasso = lasso_regression(X, y, lam=0.1)
     with open(os.path.join(MODELS_DIR, "regression_model4.pkl"), "wb") as f:
         pickle.dump(theta_lasso, f)
 
-    # Evaluate on Test Data
-    mse1, rmse1, r21 = evaluate(X_test, y_test, theta_lin)
-    X_poly_test = polynomial_features(X_test, degree=2)
-    mse2, rmse2, r22 = evaluate(X_poly_test, y_test, theta_poly)
-    mse3, rmse3, r23 = evaluate(X_test, y_test, theta_ridge)
-    mse4, rmse4, r24 = evaluate(X_test, y_test, theta_lasso)
+    mse1, rmse1, r21 = evaluate(X, y, theta_lin)
+    X_poly_test = polynomial_features(X, degree=2)
+    mse2, rmse2, r22 = evaluate(X_poly_test, y, theta_poly)
+    mse3, rmse3, r23 = evaluate(X, y, theta_ridge)
+    mse4, rmse4, r24 = evaluate(X, y, theta_lasso)
 
     print("\nModel Evaluation Results:")
     print(f"Linear Regression     -> R² = {r21:.4f}, RMSE = {rmse1:.4f}")

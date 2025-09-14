@@ -24,24 +24,24 @@ def main(args):
     metrics_output_path = args.metrics_output_path or os.path.join(BASE_DIR, "results", "train_metrics.txt")
     predictions_output_path = args.predictions_output_path or os.path.join(BASE_DIR, "results", "train_predictions.csv")
 
-    X_train, X_test, y_train, y_test = preprocess_data(data_path)
+    X, y = preprocess_data(data_path)
 
     with open(model_path, "rb") as f:
         model = pickle.load(f)
 
     if isinstance(model, tuple):
         theta, degree = model
-        X_test = polynomial_features(X_test, degree)
+        X = polynomial_features(X, degree)
     else:
         theta = model
     
-    X_b = add_bias(X_test)
+    X_b = add_bias(X)
     y_pred = X_b @ theta
 
     # Save predictions
     pd.DataFrame(y_pred).to_csv(args.predictions_output_path, index=False, header=False)
 
-    mse, rmse, r2 = evaluate(y_test, y_pred)
+    mse, rmse, r2 = evaluate(y, y_pred)
 
     os.makedirs(os.path.dirname(metrics_output_path), exist_ok=True)
     with open(metrics_output_path, "w") as f:
