@@ -84,11 +84,12 @@ if __name__ == "__main__":
     with open(os.path.join(MODELS_DIR, "regression_model4.pkl"), "wb") as f:
         pickle.dump(theta_lasso, f)
 
-    # Evaluate all models
-    mse1, rmse1, r21 = evaluate(X_train, y_train, theta_lin)
-    mse2, rmse2, r22 = evaluate(X_poly, y_train, theta_poly)
-    mse3, rmse3, r23 = evaluate(X_train, y_train, theta_ridge)
-    mse4, rmse4, r24 = evaluate(X_train, y_train, theta_lasso)
+    # Evaluate on Test Data
+    mse1, rmse1, r21 = evaluate(X_test, y_test, theta_lin)
+    X_poly_test = polynomial_features(X_test, degree=2)
+    mse2, rmse2, r22 = evaluate(X_poly_test, y_test, theta_poly)
+    mse3, rmse3, r23 = evaluate(X_test, y_test, theta_ridge)
+    mse4, rmse4, r24 = evaluate(X_test, y_test, theta_lasso)
 
     print("\nModel Evaluation Results:")
     print(f"Linear Regression     -> R² = {r21:.4f}, RMSE = {rmse1:.4f}")
